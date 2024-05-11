@@ -34,4 +34,32 @@ public class CristianClock {
     return this.clock;
   }
 
+  public static void main(String[] args) {
+    List<Thread> threads = new ArrayList<>();
+    CristianClock clock = new CristianClock(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+
+    for (int i = 0; i < 5; i++) {
+      Thread thread = new Thread(new Runnable() {
+	@Override
+	public void run() {
+	  System.out.println("Thread " + Thread.currentThread().getId() + " tiempo local antes de sincronizar: " + clock.getTime() + " segundos");
+	  clock.synchronize();
+	  System.out.println("Thread " + Thread.currentThread().getId() + " tiempo local después de sincronizar: " + clock.getTime() + " segundos");
+	}
+      });
+      threads.add(thread);
+      thread.start();
+    }
+
+    for (Thread thread : threads) {
+      try {
+	thread.join();
+      } catch (InterruptedException e) {
+	e.printStackTrace();
+      }
+    }
+
+    System.out.println("Tiempo final sincronizado: " + clock.getTime() + " segundos");
+  }
+
 }
